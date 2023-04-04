@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.SysUserMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="SysUser" id="sysUserMap">
+        <result property="id" column="id"/>
+        <result property="ctime" column="ctime"/>
+        <result property="name" column="name"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="desc" column="desc"/>
+        <result property="etime" column="etime"/>
+        <result property="enabled" column="enabled"/>
+        <result property="isys" column="isys"/>
+    </resultMap>
+
+    <select id="get" resultType="SysUser">
+        select *
+        from sys_user
+        where id = #{id}
+           or username = #{username}
+    </select>
+
+    <select id="findList" resultType="SysUser">
+        select * from sys_user where `isys` !=1
+        <choose>
+            <when test="ctime != null and ctime.trim() != ''">
+                order by ${ctime} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="findListAll" resultType="SysUser">
+        select * from sys_user where `isys` !=1
+        <if test="name != null and name != null">
+            <if test="name != null">AND (`name` like '%${name}%' OR `username` like '%${name}%')</if>
+        </if>
+        <choose>
+            <when test="ctime != null and ctime.trim() != ''">
+                order by ${ctime} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="findCount" resultType="int">
+        select count(*)
+        from sys_user
+    </select>
+
+    <insert id="save" parameterType="SysUser" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_user
+        (`ctime`,
+         `name`,
+         `username`,
+         `password`,
+         `desc`,
+         `enabled`,
+         `isys`)
+        values (#{ctime},
+                #{name},
+                #{username},
+                #{password},
+                #{desc},
+                #{enabled},
+                #{isys})
+    </insert>
+
+    <update id="update" parameterType="SysUser">
+        update sys_user
+        <set>
+            <if test="ctime != null">`ctime` = #{ctime},</if>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="username != null">`username` = #{username},</if>
+            <if test="password != null">`password` = #{password},</if>
+            <if test="desc != null">`desc` = #{desc},</if>
+            <if test="etime != null">`etime` = #{etime},</if>
+            <if test="enabled != null">`enabled` = #{enabled},</if>
+            <if test="isys != null">`isys` = #{isys}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete
+        from sys_user
+        where id = #{value}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from sys_user where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
