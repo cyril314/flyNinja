@@ -23,12 +23,12 @@ public class RedisService {
     private Jedis jedis = null;
 
     public <T> T getEntity(String key, Class<T> clazz) {
-        String jsonParam = JacksonUtil.toJSon(getValue(key));
+        String jsonParam = JacksonUtil.toJson(getValue(key));
         return JacksonUtil.readValue(jsonParam, clazz);
     }
 
     public void setEntity(Map<String, Object> params, String key) {
-        String jsonParam = JacksonUtil.toJSon(params);
+        String jsonParam = JacksonUtil.toJson(params);
         setValue(key, jsonParam);
     }
 

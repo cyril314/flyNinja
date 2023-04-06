@@ -1,7 +1,6 @@
 $(function () {
     // 读取body data-type 判断是哪个页面然后执行相应页面方法，方法在下面。
     let dataType = $('body').attr('data-type');
-    console.log(dataType);
     for (let key in pageData) {
         if (key == dataType) {
             pageData[key]();
@@ -77,6 +76,12 @@ $(function () {
         saveSelectColor.Color = $(this).attr('data-color');
         storageSave(saveSelectColor);
     });
+
+    $.getUrlParam = function (name) {
+        let r = window.location.search.substr(1).match(new RegExp("(^|&)" + name + "=([^&]*)(&|$)"));
+        if (r != null) return decodeURI(r[2]);
+        return null;
+    }
 });
 // 页面数据
 var pageData = {

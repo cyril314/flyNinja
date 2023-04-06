@@ -33,7 +33,6 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/login").with(IndexController::showLoginForm);
         router.POST().route("/register").with(IndexController::register);
         router.GET().route("/register").with(IndexController::showRegisterForm);
-        router.GET().route("/logout").with(IndexController::logout);
 
         ///////////////////////////////////////////////////////////////////////
         // Index / Catchall shows index page

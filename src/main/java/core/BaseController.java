@@ -4,14 +4,12 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import ninja.Context;
 import ninja.Cookie;
-import ninja.session.Session;
 import ninja.utils.NinjaProperties;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.DateUtils;
 import utils.JacksonUtil;
-import utils.SessionUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +37,7 @@ public class BaseController {
         Preconditions.checkNotNull(context, "Valid context is required for getCookie");
 
         Cookie cookie = context.getCookie(getCookieName());
-        if (cookie != null && SessionUtil.isNotBlank(cookie.getValue())) {
+        if (cookie != null && isNotBlank(cookie.getValue())) {
             String[] cookieValue = cookie.getValue().split(SEPARATOR);
             if (cookieValue.length == 3) {
                 String sign = cookieValue[0];
@@ -88,7 +86,7 @@ public class BaseController {
      */
     protected <T> T getEntity(Context context, Class<T> clazz) {
         Map<String, Object> paramsMap = getParamsMap(context);
-        String jsonParam = JacksonUtil.toJSon(paramsMap);
+        String jsonParam = JacksonUtil.toJson(paramsMap);
         return JacksonUtil.readValue(jsonParam, clazz);
     }
 
@@ -122,5 +120,25 @@ public class BaseController {
             log.error("getParamsMap错误信息：{}", e);
         }
         return returnMap;
+    }
+
+    /**
+     * 判断某字符串是否为空或长度为0或由空白符构成
+     */
+    public static boolean isBlank(CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (Character.isWhitespace(cs.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isNotBlank(CharSequence cs) {
+        return !isBlank(cs);
     }
 }

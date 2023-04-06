@@ -4,15 +4,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import core.BaseController;
+import core.NinjaKey;
+import core.ResultJson;
 import filters.AuthenticationFilter;
 import models.SysUser;
 import ninja.*;
 import ninja.params.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import services.RedisService;
 import services.UserService;
-import utils.SessionUtil;
+import utils.JacksonUtil;
 
 @Singleton
 public class IndexController extends BaseController {
@@ -21,8 +22,6 @@ public class IndexController extends BaseController {
 
     @Inject
     ReverseRouter reverseRouter;
-    @Inject
-    RedisService redisService;
     @Inject
     UserService userService;
 
@@ -42,12 +41,12 @@ public class IndexController extends BaseController {
             boolean isValid = userService.authenticate(pass, user.getPassword());
             if (isValid) {
                 log.info("User is Authenticated: " + isValid);
-                SessionUtil.setSessionValue("username", user.getUsername());
-                setCookie(username, context);
+                context.getSession().put(NinjaKey.AUTHENTICATED_USER, user.getUsername());
+
                 return reverseRouter.with(IndexController::index).redirect();
             } else {
                 log.info("Wrong credentials ... redirecting to login");
-                return reverseRouter.with(IndexController::showLoginForm).redirect();
+                return reverseRouter.with(IndexController::showLoginForm).queryParam("data", "用户登录密码错误").redirect();
             }
         } else {
             log.info("User does not exists: " + username + "... go register");
@@ -70,13 +69,8 @@ public class IndexController extends BaseController {
         return reverseRouter.with(IndexController::showLoginForm).redirect();
     }
 
-    public Result logout(Context context) {
-        log.info("User session invalidated, log in again");
-        String content = "成功退出";
-        return reverseRouter.with(IndexController::showLoginForm).redirect().render(content);
-    }
-
-    public Result showLoginForm() {
+    public Result showLoginForm(Context context) {
+        log.info(context.getAttributes().toString());
         return Results.html().template("views/system/login.ftl.html");
     }
 

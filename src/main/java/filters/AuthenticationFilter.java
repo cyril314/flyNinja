@@ -2,10 +2,10 @@ package filters;
 
 import com.google.inject.Inject;
 import controllers.IndexController;
+import core.NinjaKey;
 import ninja.*;
+import ninja.session.Session;
 import org.slf4j.Logger;
-import services.RedisService;
-import utils.JacksonUtil;
 
 /**
  * @className: AuthenticationFilter
@@ -19,25 +19,19 @@ public class AuthenticationFilter implements Filter {
     Logger log;
     @Inject
     ReverseRouter reverseRouter;
-    @Inject
-    RedisService redisService;
 
     @Override
     public Result filter(FilterChain chain, Context context) {
-        log.debug("Request Path: {}", context.getRequestPath());
-        if (context.getRequestPath().equals("/logout")) {
+        Session session = context.getSession();
+        String requestPath = context.getRequestPath();
+        log.debug("Request Path: {}", requestPath);
+        String sessionValueString = session.get(NinjaKey.AUTHENTICATED_USER);
+        if (requestPath.equals("/logout") || sessionValueString == null) {
             log.debug("Logout Path: {}", context.getRequestPath());
-            return reverseRouter.with(IndexController::logout).redirect();
-        }
-        String sessionValueString = redisService.getValue(context.getSession().getId());
-        if (sessionValueString == null) {
-            log.info("We couldn't find a value from REDIS ");
-            context.getSession().clear();
-            return Results.forbidden().html().template("/views/system/403forbidden.ftl.html");
+            session.clear();
+            return reverseRouter.with(IndexController::showLoginForm).redirect();
         }
 
-        String json = JacksonUtil.toJSon(sessionValueString);
-        log.info("We have retrieved a session object [{}]", json);
         return chain.next(context);
     }
 }

@@ -16,7 +16,7 @@ public class NinjaKey {
 
     public static final String APPLICATION_SECRET = "application.secret";
 
-    public static final String AUTHENTICATED_USER = "authenticateduser";
+    public static final String AUTHENTICATED_USER = "authenticated.user";
 
     public static final String DEFAULT_AUTH_COOKIE_NAME = "ninja-authentication";
 }

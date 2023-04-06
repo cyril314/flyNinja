@@ -63,7 +63,7 @@ public final class JacksonUtil {
      *
      * @param object
      */
-    public static String toJSon(Object object) {
+    public static String toJson(Object object) {
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
         }

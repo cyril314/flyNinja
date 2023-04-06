@@ -37,8 +37,8 @@ public class FitApplication {
             web.addServlet("freemarker.ext.servlet.FreemarkerServlet", "*.ftl.html");
             web.addEventListener(new NinjaServletListener());
 
-            web.setClassLoader(Thread.currentThread().getContextClassLoader());
             // 设置Web内容上下文路径
+            web.setClassLoader(Thread.currentThread().getContextClassLoader());
             web.setResourceBase(RESOURCE_PATH);
             web.setResourceAliases(getResources());
             web.setParentLoaderPriority(true);
@@ -50,7 +50,6 @@ public class FitApplication {
                 System.exit(1);
             }
             server.start();
-
             log.info("\n---------------------------------------------------------\n" +
                     "Application Fly-Jetty is running! Access URLs:\n\t" +
                     "Local: \t\thttp://localhost:" + port + "/\n\t" +
